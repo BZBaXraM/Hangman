@@ -4,15 +4,13 @@
 #include <string>
 #include <cstdlib>
 
-enum MENU {
-    PLAY = 1,
-    EXIT = 2,
-    TELEGRAM = 3
+enum class MENU {
+    PLAY = 1, EXIT, TELEGRAM
 };
 
 class Hangman {
 private:
-    int lives = 12; // Жизнь игрока (можете написать сколько угодно)
+    int lives = 5; // Жизнь игрока (можете написать сколько угодно)
     char answer = 0;
 
     std::string hiddenWord;
@@ -55,13 +53,13 @@ public:
 
     ~Hangman();
 
-     void setAnswer();
+    void setAnswer();
 
-     void showHiddenWord();
+    void showHiddenWord();
 
-     bool isWordCorrect() const;
+    bool isWordCorrect() const;
 
-     int getLifes() const { return lives; }
+    int getLifes() const { return lives; }
 
 };
 
@@ -128,6 +126,8 @@ bool Hangman::isWordCorrect() const {
 }
 
 int main() {
+    srand(time(nullptr));
+
     std::cout << "\t\tHangman by Bahram Bayramzade \n";
     std::string str;
     str = "https://t.me/baxram97";
@@ -139,26 +139,24 @@ int main() {
               "3. Get my Telegram \n"
               "Your choice: " << std::endl;
     std::cin >> menu;
-    srand(time(NULL));
     Hangman *hangman = new Hangman;
     clock_t t, t1;
     hangman->showHiddenWord();
     t = clock();
     while (!hangman->isWordCorrect()) {
         switch (menu) {
-            case PLAY:
+            case static_cast<int>(MENU::PLAY):
                 hangman->setAnswer();
                 break;
-            case EXIT:
+            case static_cast<int>(MENU::EXIT):
                 exit(0);
-            case TELEGRAM:
+            case static_cast<int>(MENU::TELEGRAM):
                 std::cout << str << std::endl;
                 exit(0);
             default:
                 std::cout << "Error type! " << std::endl;
                 break;
         }
-
     }
     t1 = clock();
     std::cout << "You win!" << std::endl;
