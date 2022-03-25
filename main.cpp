@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <cstdlib>
 
 using namespace std;
 
@@ -47,7 +48,7 @@ public:
             while (inS.get(ch)) {
                 if (ch != '\n') {
                     randomWord += ch;
-                } else if ((rand() * 10) % 3 == 0) {
+                } else if ((rand() * 10) % 20 == 0) {
                     word = randomWord;
                     inS.close();
                     break;
