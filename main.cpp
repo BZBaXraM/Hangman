@@ -12,7 +12,7 @@ enum class MENU {
 
 class Hangman {
 private:
-    time_t start{}, end{};
+    time_t start = 0, end = 0;
     int lives = 20; // Жизнь игрока (можете написать сколько угодно)
     char answer = 0;
 
@@ -22,9 +22,9 @@ private:
     string randomWord;
 
 
-    bool ifCorrect() const {
-        for (char i: word) {
-            if (i == answer)
+    inline bool ifCorrect() const {
+        for (int i = 0; i < word.length(); i++) {
+            if (word[i] == answer)
                 return true;
         }
         return false;
@@ -43,11 +43,11 @@ public:
 
             decrypt("enC.bin", "Word",
                     20); /* Логика моей шифровки такого: На вход мы передаем тот бинарный файл со словами в шифровынным виде (копм никак не откроет этот файл и не прочитает - даже если прочитает, то там будут непонятные вещи…) А на вывод мы создаем файл (в моем слуаче это Word или Word.txt, и отдельно добавлю, что этот создается при запуске программы) и дальше функция расшифрует слова из enC.bin и записывает в Word! */
-            std::ifstream inS("Word", ios::in); // Считываем созданный файл…
+            ifstream inS("Word", ios::in); // Считываем созданный файл…
             while (inS.get(ch)) {
                 if (ch != '\n') {
                     randomWord += ch;
-                } else if ((rand() * 10) % 3) {
+                } else if ((rand() * 10) % 3 == 0) {
                     word = randomWord;
                     inS.close();
                     break;
@@ -115,7 +115,7 @@ void Hangman::setAnswer() {
 }
 
 void Hangman::showHiddenWord() {
-    if (counter <= 0) {
+    if (!(counter > 0)) {
         for (int i = 0; i < word.length(); i++) {
             hiddenWord.insert(hiddenWord.begin(), '*');
         }
@@ -191,10 +191,12 @@ void Hangman::decrypt(const string &inFileName, const string &outFileName, int o
     //Записываем в файл
     ofstream outFile(outFileName.c_str());
 
-    for (auto &i: text) {
-        outFile << i << endl;
+    for (unsigned int i = 0; i < text.size(); i++) {
+        outFile << text[i] << std::endl;
     }
     outFile.close();
+
+    return;
 }
 
 void Hangman::status() {
