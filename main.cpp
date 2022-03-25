@@ -1,9 +1,10 @@
 #include <ctime>
 #include <fstream>
 #include <iostream>
-#include <string>
-#include <cstdlib>
 #include <vector>
+#include <string>
+
+using namespace std;
 
 enum class MENU {
     PLAY = 1, EXIT, TELEGRAM
@@ -11,17 +12,19 @@ enum class MENU {
 
 class Hangman {
 private:
+    time_t start{}, end{};
     int lives = 20; // Жизнь игрока (можете написать сколько угодно)
     char answer = 0;
 
-    std::string hiddenWord;
+    string hiddenWord;
     int succesCounter = 0;
     int counter = 0;
+    string randomWord;
 
 
-    inline bool ifCorrect() const {
-        for (int i = 0; i < word.length(); i++) {
-            if (word[i] == answer)
+    bool ifCorrect() const {
+        for (char i: word) {
+            if (i == answer)
                 return true;
         }
         return false;
@@ -29,21 +32,22 @@ private:
 
 
 public:
-    std::string word; // Слово
+    string word; // Слово
     int currentLives = 0; // текущая жизнь
     char massSymbol[12]{}; // Считваем буквы в конце игры
 
     Hangman() {
-        std::string randomWord;
+
         char ch;
         while (randomWord.empty()) {
-            decrypt("enC.bin", "Word.bin",
-                    20); /* Логика моей шифровки такого: На вход мы передаем тот бинарный файл со словами в шифровынным виде (копм никак не откроет этот файл и не прочитает - даже если прочитает, то там будут непонятные вещи…) А на вывод мы создаем файл (в моем слуаче это Word.bin, и отдельно добавлю, что этот создается при запуске программы) и дальше функция расшифрует слова из enC.bin и записывает в Word.bin! */
-            std::ifstream inS("Word.bin", std::ios::in | std::ios::binary); // Считываем созданный файл…
+
+            decrypt("enC.bin", "Word",
+                    20); /* Логика моей шифровки такого: На вход мы передаем тот бинарный файл со словами в шифровынным виде (копм никак не откроет этот файл и не прочитает - даже если прочитает, то там будут непонятные вещи…) А на вывод мы создаем файл (в моем слуаче это Word или Word.txt, и отдельно добавлю, что этот создается при запуске программы) и дальше функция расшифрует слова из enC.bin и записывает в Word! */
+            std::ifstream inS("Word", ios::in); // Считываем созданный файл…
             while (inS.get(ch)) {
                 if (ch != '\n') {
                     randomWord += ch;
-                } else if ((rand() * 10) % 3 == 0) {
+                } else if ((rand() * 10) % 3) {
                     word = randomWord;
                     inS.close();
                     break;
@@ -52,9 +56,9 @@ public:
                 }
             }
         }
-    }
 
-    ~Hangman();
+
+    }
 
     void setAnswer();
 
@@ -66,29 +70,16 @@ public:
 
     bool checkChar(char c);
 
-    void decrypt(const std::string &inFileName, const std::string &outFileName, int offset);
+    void decrypt(const string &inFileName, const string &outFileName, int offset);
 
-    void status() {
-        clock_t t, t1;
-        t = clock();
-        std::cout << "Your attempts: " << currentLives << std::endl;
-        std::cout << "You time: " << (t1 - t) / CLK_TCK << std::endl;
-        std::cout << "Rand word is: " << word << std::endl;
-        std::cout << "Your attempts: " << std::endl;
-        for (int i = 0; i < currentLives; i++)
-            std::cout << i + 1 << " - " << massSymbol[i] << std::endl;
-    } // Вывод всего в конце игры
+    void status();// Вывод всего в конце игры
 };
 
-
-Hangman::~Hangman() {
-    std::cout << "Game destructor is called! " << std::endl;
-}
-
 void Hangman::setAnswer() {
-    std::cout << "Enter the letter" << std::endl;
-    std::cout << ">>> ";
-    std::cin >> answer;
+    time(&start);
+    cout << "Enter the letter" << std::endl;
+    cout << ">>> ";
+    cin >> answer;
     massSymbol[currentLives] = answer;
     currentLives++;
     for (int i = 0; i < word.length(); i++) {
@@ -97,42 +88,39 @@ void Hangman::setAnswer() {
             succesCounter++;
         }
     }
-
+    //system("cls");
     if (succesCounter > 0) {
-        std::cout << "Correct letter [+]!" << std::endl;
-        system("clear"); // cls
-        std::cout << "Current word: ";
+        cout << "Correct letter [+]!" << endl;
+        cout << "Current word: ";
         showHiddenWord();
-        std::cout << std::endl;
+        cout << endl;
         succesCounter = 0;
 
-        std::cout << "Count of your lives: " << lives << std::endl;
+        cout << "Count of your lives: " << lives << endl;
     } else {
-        std::cout << "Incorrect letter [-]!" << std::endl;
-        std::cin.ignore(); // pause
-//        system("clear");
-        std::cout << "Current word: ";
+        cout << "Incorrect letter [-]!" << endl;
+        cout << "Current word: ";
         showHiddenWord();
-        std::cout << std::endl;
+        cout << endl;
         lives--;
 
-        std::cout << "Count of your lives: " << lives << std::endl;
+        cout << "Count of your lives: " << lives << endl;
 
         if (lives <= 0) {
-            std::cout << "You died!" << std::endl;
+            cout << "You died!" << endl;
             status();
-            std::exit(1);
+            exit(1);
         }
     }
 }
 
 void Hangman::showHiddenWord() {
-    if (!(counter > 0)) {
+    if (counter <= 0) {
         for (int i = 0; i < word.length(); i++) {
             hiddenWord.insert(hiddenWord.begin(), '*');
         }
     }
-    std::cout << hiddenWord << std::endl;
+    cout << hiddenWord << endl;
     counter++;
 }
 
@@ -153,30 +141,28 @@ bool Hangman::checkChar(char c) {
     }
 }
 
-void Hangman::decrypt(const std::string &inFileName, const std::string &outFileName, int offset) {
-    std::ifstream inFile(inFileName.c_str());
+void Hangman::decrypt(const string &inFileName, const string &outFileName, int offset) {
+    ifstream inFile(inFileName.c_str());
 
     //Считываем код
-    std::vector<std::string> code;
+    vector<string> code;
     while (true) {
-        std::string str;
+        string str;
 
         inFile >> str;
 
         if (inFile.eof()) {
             break;
         }
-
         code.push_back(str);
     }
 
     inFile.close();
 
-    //Дешифровка
-    std::vector<std::string> text;
+    vector<string> text;
 
     for (auto &i: code) {
-        std::string textStr;
+        string textStr;
 
         for (char j: i) {
             if (checkChar(j)) {
@@ -203,31 +189,43 @@ void Hangman::decrypt(const std::string &inFileName, const std::string &outFileN
     }
 
     //Записываем в файл
-    std::ofstream outFile(outFileName.c_str());
+    ofstream outFile(outFileName.c_str());
 
-    for (unsigned int i = 0; i < text.size(); i++) {
-        outFile << text[i] << std::endl;
+    for (auto &i: text) {
+        outFile << i << endl;
     }
     outFile.close();
+}
 
-    return;
+void Hangman::status() {
+    time(&end);
+    double seconds = difftime(end, start);
+    int minutes = 0;
+    minutes = seconds / 60;
+    seconds = seconds - (minutes * 60);
+    cout << "You time: " << minutes << " minutes " << seconds << " seconds" << endl;
+    cout << "Your attempts: " << currentLives << endl;
+    cout << "Rand word is: " << word << endl;
+    cout << "Your attempts: " << endl;
+    for (int i = 0; i < currentLives; i++)
+        cout << i + 1 << " - " << massSymbol[i] << endl;
 }
 
 int main() {
     srand(time(nullptr));
 
-    std::cout << "\t\tHangman by Bahram Bayramzade \n";
-    std::string str;
+    cout << "\t\tHangman by Bahram Bayramzade \n";
+    string str;
     str = "https://t.me/baxram97";
 
     int menu;
-    std::cout <<
-              "1. Play game\n"
-              "2. Exit from game\n"
-              "3. Get my Telegram \n"
-              "Your choice: " << std::endl;
-    std::cin >> menu;
-    Hangman *hangman = new Hangman;
+    cout <<
+         "1. Play game\n"
+         "2. Exit from game\n"
+         "3. Get my Telegram \n"
+         "Your choice: " << endl;
+    cin >> menu;
+    unique_ptr<Hangman> hangman = make_unique<Hangman>();
     hangman->showHiddenWord();
     while (!hangman->isWordCorrect()) {
         switch (menu) {
@@ -237,17 +235,15 @@ int main() {
             case static_cast<int>(MENU::EXIT):
                 exit(0);
             case static_cast<int>(MENU::TELEGRAM):
-                std::cout << str << std::endl;
+                cout << str << endl;
                 exit(0);
             default:
-                std::cout << "Error type! " << std::endl;
+                cout << "Error type! " << endl;
                 break;
         }
     }
-    std::cout << "You win!" << std::endl;
+    cout << "You win!" << endl;
     hangman->status();
-
-    delete hangman;
 
     return 0;
 }
