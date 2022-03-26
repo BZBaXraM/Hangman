@@ -38,7 +38,7 @@ public:
     char massSymbol[12]{}; // Считваем буквы в конце игры
 
     Hangman() {
-
+        time(&start);
         char ch;
         while (randomWord.empty()) {
 
@@ -77,7 +77,6 @@ public:
 };
 
 void Hangman::setAnswer() {
-    time(&start);
     cout << "Enter the letter" << std::endl;
     cout << ">>> ";
     cin >> answer;
