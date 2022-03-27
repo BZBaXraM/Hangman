@@ -13,14 +13,17 @@ enum class MENU {
 
 class Hangman {
 private:
-    time_t start = 0, end = 0;
+    time_t start = 0, end = 0; // Время
     int lives = 20; // Жизнь игрока (можете написать сколько угодно)
     char answer = 0;
 
     string hiddenWord;
     int succesCounter = 0;
     int counter = 0;
-    string randomWord;
+    string randomWord; // рандомное слово
+    string word; // Слово
+    int currentLives = 0; // текущая жизнь
+    char massSymbol[12]{}; // Считваем буквы в конце игры
 
 
     inline bool ifCorrect() const {
@@ -33,9 +36,6 @@ private:
 
 
 public:
-    string word; // Слово
-    int currentLives = 0; // текущая жизнь
-    char massSymbol[12]{}; // Считваем буквы в конце игры
 
     Hangman() {
         time(&start);
