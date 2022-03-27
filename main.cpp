@@ -13,14 +13,14 @@ enum class MENU {
 
 class Hangman {
 private:
-    time_t start = 0, end = 0; // Время
+    time_t start = 0, end = 0;
     int lives = 20; // Жизнь игрока (можете написать сколько угодно)
     char answer = 0;
 
     string hiddenWord;
     int succesCounter = 0;
     int counter = 0;
-    string randomWord; // рандомное слово
+    string randomWord;
     string word; // Слово
     int currentLives = 0; // текущая жизнь
     char massSymbol[12]{}; // Считваем буквы в конце игры
@@ -37,29 +37,11 @@ private:
 
 public:
 
-    Hangman() {
-        time(&start);
-        char ch;
-        while (randomWord.empty()) {
+    Hangman(int lives, char answer, string &hiddenWord, int succesCounter, int counter, string &randomWord,
+            string &word, int currentLives) : lives(lives), answer(answer), randomWord(randomWord), counter(counter),
+                                              hiddenWord(hiddenWord), succesCounter(succesCounter),
+                                              word(word), currentLives(currentLives) {}
 
-            decrypt("enC.bin", "Word",
-                    20); /* Логика моей шифровки такого: На вход мы передаем тот бинарный файл со словами в шифровынным виде (копм никак не откроет этот файл и не прочитает - даже если прочитает, то там будут непонятные вещи…) А на вывод мы создаем файл (в моем слуаче это Word или Word.txt, и отдельно добавлю, что этот создается при запуске программы) и дальше функция расшифрует слова из enC.bin и записывает в Word! */
-            ifstream inS("Word", ios::in); // Считываем созданный файл…
-            while (inS.get(ch)) {
-                if (ch != '\n') {
-                    randomWord += ch;
-                } else if ((rand() * 10) % 20 == 0) {
-                    word = randomWord;
-                    inS.close();
-                    break;
-                } else {
-                    randomWord.clear();
-                }
-            }
-        }
-
-
-    }
 
     void setAnswer();
 
@@ -67,13 +49,14 @@ public:
 
     bool isWordCorrect() const;
 
-    int getLifes() const { return lives; }
+    int getLives() const { return lives; }
 
     bool checkChar(char c);
 
     void decrypt(const string &inFileName, const string &outFileName, int offset);
 
     void status();// Вывод всего в конце игры
+    Hangman();
 };
 
 void Hangman::setAnswer() {
@@ -191,8 +174,8 @@ void Hangman::decrypt(const string &inFileName, const string &outFileName, int o
     //Записываем в файл
     ofstream outFile(outFileName.c_str());
 
-    for (unsigned int i = 0; i < text.size(); i++) {
-        outFile << text[i] << std::endl;
+    for (auto &i: text) {
+        outFile << i << std::endl;
     }
     outFile.close();
 
@@ -211,6 +194,28 @@ void Hangman::status() {
     cout << "Your attempts: " << endl;
     for (int i = 0; i < currentLives; i++)
         cout << i + 1 << " - " << massSymbol[i] << endl;
+}
+
+Hangman::Hangman() {
+    time(&start);
+    char ch;
+    while (randomWord.empty()) {
+
+        decrypt("enC.bin", "Word",
+                20); /* Логика моей шифровки такого: На вход мы передаем тот бинарный файл со словами в шифровынным виде (копм никак не откроет этот файл и не прочитает - даже если прочитает, то там будут непонятные вещи…) А на вывод мы создаем файл (в моем слуаче это Word или Word.txt, и отдельно добавлю, что этот создается при запуске программы) и дальше функция расшифрует слова из enC.bin и записывает в Word! */
+        ifstream inS("Word", ios::in); // Считываем созданный файл…
+        while (inS.get(ch)) {
+            if (ch != '\n') {
+                randomWord += ch;
+            } else if ((rand() * 10) % 20 == 0) {
+                word = randomWord;
+                inS.close();
+                break;
+            } else {
+                randomWord.clear();
+            }
+        }
+    }
 }
 
 int main() {
