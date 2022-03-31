@@ -16,7 +16,6 @@ private:
     time_t start = 0, end = 0;
     int lives = 20; // Жизнь игрока (можете написать сколько угодно)
     char answer = 0;
-
     string hiddenWord;
     int succesCounter = 0;
     int counter = 0;
@@ -56,6 +55,7 @@ public:
     void decrypt(const string &inFileName, const string &outFileName, int offset);
 
     void status();// Вывод всего в конце игры
+
     Hangman();
 };
 
@@ -71,8 +71,8 @@ void Hangman::setAnswer() {
             succesCounter++;
         }
     }
-    //system("cls");
     if (succesCounter > 0) {
+        system("clear");
         cout << "Correct letter [+]!" << endl;
         cout << "Current word: ";
         showHiddenWord();
@@ -81,7 +81,11 @@ void Hangman::setAnswer() {
 
         cout << "Count of your lives: " << lives << endl;
     } else {
+        system("clear");
         cout << "Incorrect letter [-]!" << endl;
+        for (int i = 0; i < currentLives; i++)
+            cout << massSymbol[i] << " ";
+        cout << endl;
         cout << "Current word: ";
         showHiddenWord();
         cout << endl;
@@ -201,13 +205,13 @@ Hangman::Hangman() {
     char ch;
     while (randomWord.empty()) {
 
-        decrypt("enC.bin", "Word",
-                20); /* Логика моей шифровки такого: На вход мы передаем тот бинарный файл со словами в шифровынным виде (копм никак не откроет этот файл и не прочитает - даже если прочитает, то там будут непонятные вещи…) А на вывод мы создаем файл (в моем слуаче это Word или Word.txt, и отдельно добавлю, что этот создается при запуске программы) и дальше функция расшифрует слова из enC.bin и записывает в Word! */
+        decrypt("enC.txt", "Word",
+                22); /* Логика моей шифровки такого: На вход мы передаем тот txt файл со словами в шифровынным виде и, если комп прочитает его, то там будут непонятные вещи. (Игра без этого файла не запустится; скиньте этот файл (enC.txt) в папку проекта Visual Studio. А на вывод мы создаем файл (в моем слуаче это Word или Word.txt, и отдельно добавлю, что этот создается при запуске программы) и дальше функция расшифрует слова из enC.txt и записывает в Word! */
         ifstream inS("Word", ios::in); // Считываем созданный файл…
         while (inS.get(ch)) {
             if (ch != '\n') {
                 randomWord += ch;
-            } else if ((rand() * 10) % 20 == 0) {
+            } else if ((rand() * 10) % randomWord.size()) {
                 word = randomWord;
                 inS.close();
                 break;
