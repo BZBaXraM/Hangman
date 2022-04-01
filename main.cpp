@@ -72,7 +72,7 @@ void Hangman::setAnswer() {
         }
     }
     if (succesCounter > 0) {
-        system("clear");
+        system("clear"); // Замените на system("cls")
         cout << "Correct letter [+]!" << endl;
         cout << "Current word: ";
         showHiddenWord();
@@ -81,7 +81,7 @@ void Hangman::setAnswer() {
 
         cout << "Count of your lives: " << lives << endl;
     } else {
-        system("clear");
+        system("clear"); // Замените на system("cls")
         cout << "Incorrect letter [-]!" << endl;
         for (int i = 0; i < currentLives; i++)
             cout << massSymbol[i] << " ";
@@ -206,7 +206,7 @@ Hangman::Hangman() {
     while (randomWord.empty()) {
 
         decrypt("enC.txt", "Word",
-                22); /* Логика моей шифровки такого: На вход мы передаем тот txt файл со словами в шифровынным виде и, если комп прочитает его, то там будут непонятные вещи. (Игра без этого файла не запустится; скиньте этот файл (enC.txt) в папку проекта Visual Studio. А на вывод мы создаем файл (в моем слуаче это Word или Word.txt, и отдельно добавлю, что этот создается при запуске программы) и дальше функция расшифрует слова из enC.txt и записывает в Word! */
+                22); /* Логика моей шифровки такого: На вход мы передаем тот txt файл со словами в шифровынным виде и, если комп прочитает его, то там будут непонятные вещи. (Игра без этого файла не запустится; скиньте этот файл (enC.txt) в папку проекта Visual Studio. А на вывод мы создаем файл (в моем слуаче это Word или Word.txt, и отдельно добавлю, что этот файл создается при запуске программы) и дальше функция расшифрует слова из enC.txt и записывает в Word! */
         ifstream inS("Word", ios::in); // Считываем созданный файл…
         while (inS.get(ch)) {
             if (ch != '\n') {
